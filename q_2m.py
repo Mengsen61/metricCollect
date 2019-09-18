@@ -121,6 +121,7 @@ class Metric(object):
                             s_formId = formId.get('key')
                             for opMethod in formId.get('3').get('buckets'):
                                 s_opMethod = opMethod.get('key')
+                                loop_count = 0
                                 for timestamp in opMethod.get('2').get('buckets'):  
                                     if loop_count == 0:
                                         loop_count += 1
