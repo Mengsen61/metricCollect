@@ -128,6 +128,7 @@ class Metric(object):
         )
 
         res_list = response.get('aggregations').get('5').get('buckets')
+        print(res_list)
 
         for cluster in res_list:
             s_cluster = cluster.get('key')
@@ -146,14 +147,14 @@ class Metric(object):
                             else:
                                 s_timestamp = timestamp.get('key')
                                 s_count = timestamp.get('doc_count')
-                                alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
+                                #alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
                                 #self.update_mysql(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
                                 #print(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
-
+#so what now
 
 if __name__ == "__main__":
     metric1 = Metric(keyword="*")
     metric1.metric_query()
 
-    metric2 = Metric(keyword="message:\"登录\"")
-    metric2.metric_query()
+    # metric2 = Metric(keyword="message:\"登录\"")
+    # metric2.metric_query()
