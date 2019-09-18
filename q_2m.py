@@ -106,7 +106,7 @@ class Metric(object):
         )
 
         res_list = response.get('aggregations').get('6').get('buckets')
-        print(res_list)
+        #print(res_list)
 
         for cluster in res_list:
             s_cluster = cluster.get('key')
