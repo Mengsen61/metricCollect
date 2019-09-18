@@ -53,7 +53,7 @@ class Metric(object):
                 {
                     "range":{
                         "@timestamp":{
-                        "gte":"now-2m","lte":"now","format":"epoch_millis"
+                        "gte":"now-60m","lte":"now","format":"epoch_millis"
                     }
                 }},
                 {
@@ -96,7 +96,7 @@ class Metric(object):
                                                     "aggs":{
                                                         "2":{
                                                             "date_histogram":{
-                                                                "interval":"20s","field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-2m","max":"now"},"format":"epoch_millis"
+                                                                "interval":"20s","field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-60m","max":"now"},"format":"epoch_millis"
                                                             },
                                                             "aggs":{}}}}}}}}}}}}}}}}
         print(body)
