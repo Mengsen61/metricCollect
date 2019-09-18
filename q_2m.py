@@ -46,111 +46,91 @@ class Metric(object):
     def metric_query(self):
         client = Elasticsearch(self.eshost)
         body = {
-            "query": {
-                "bool": {
-                    "filter": [
-                        {"range": {"@timestamp": {"gte": "now-2m", "lte": "now"}}},
-                        {"query_string": {
-                            "analyze_wildcard": True,
-                            "query": "%s" % self.keyword
-                        }}
-                    ]
-                }
-            },
-            "aggs": {
-                "5": {
-                    "terms": {
-                        "field": "clusterName.keyword",
-                        "size": 500,
-                        "order": {
-                            "_term": "desc"
-                        },
-                        "min_doc_count": 1
-                    },
-                    "aggs": {
-                        "6": {
-                            "terms": {
-                                "field": "appName.keyword",
-                                "size": 500,
-                                "order": {
-                                    "_term": "desc"
-                                },
-                                "min_doc_count": 1
-                            },
-                            "aggs": {
-                                "7": {
-                                    "terms": {
-                                        "field": "className.keyword",
-                                        "size": 500,
-                                        "order": {
-                                            "_term": "desc"
-                                        },
-                                        "min_doc_count": 1
-                                    },
-                                    "aggs": {
-                                        "3": {
-                                            "terms": {
-                                                "field": "level.keyword",
-                                                "size": 500,
-                                                "order": {
-                                                    "_term": "desc"
-                                                },
-                                                "min_doc_count": 1
-                                            },
-                                            "aggs": {
-                                                "2": {
-                                                    "date_histogram": {
-                                                        "interval": "%s" % self.interval,
-                                                        "field": "@timestamp",
-                                                        "min_doc_count": 0,
-                                                        "extended_bounds": {
-                                                            "min": "now-2m",
-                                                            "max": "now"
-                                                        },
-                                                        "format": "epoch_millis"
-                                                    },
-                                                    "aggs": { }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+    "size":0,
+    "query":{
+        "bool":{
+            "filter":[
+                {
+                    "range":{
+                        "@timestamp":{
+                        "gte":"now-2m","lte":"now","format":"epoch_millis"
                     }
-                }
-            }
+                }},
+                {
+                    "query_string":{
+                        "analyze_wildcard": True,
+                        "query":"level:\"ERROR\""}}
+                    ]
         }
+    },
+    "aggs":{
+        "6":{
+            "terms":{
+                "field":"clusterName.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+            },
+            "aggs":{
+                "7":{
+                    "terms":{
+                        "field":"appName.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+                    },
+                    "aggs":{
+                        "8":{
+                            "terms":{
+                                "field":"logtags.appId.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+                            },
+                            "aggs":{
+                                "9":{
+                                    "terms":{
+                                        "field":"className.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+                                    },
+                                    "aggs":{
+                                        "10":{
+                                            "terms":{
+                                                "field":"logtags.formId.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+                                            },
+                                            "aggs":{
+                                                "3":{
+                                                    "terms":{
+                                                        "field":"logtags.opMethod.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+                                                    },
+                                                    "aggs":{
+                                                        "2":{
+                                                            "date_histogram":{
+                                                                "interval":"20s","field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-2m","max":"now"},"format":"epoch_millis"
+                                                            },
+                                                            "aggs":{}}}}}}}}}}}}}}}}
         print(body)
         response = client.search(
             index="*",
             body=body
         )
 
-        res_list = response.get('aggregations').get('5').get('buckets')
+        res_list = response.get('aggregations').get('6').get('buckets')
         print(res_list)
 
         for cluster in res_list:
             s_cluster = cluster.get('key')
             print(s_cluster)
-            for app in cluster.get('6').get('buckets'):
+            for app in cluster.get('7').get('buckets'):
                 s_app = app.get('key')
-                for classname in app.get('7').get('buckets'):
-                    s_classname = classname.get('key')
-                    for level in classname.get('3').get('buckets'):
-                        s_level = level.get('key')
-                        loop_count = 0
-                        for timestamp in level.get('2').get('buckets'):
-                            if loop_count == 0:
-                                loop_count += 1
-                                continue
-                            else:
-                                s_timestamp = timestamp.get('key')
-                                s_count = timestamp.get('doc_count')
+                for appId in app.get('8').get('buckets'):
+                    s_appId = appId.get('key')
+                    for className in appId.get('9').get('buckets'):
+                        s_classname = className.get('key')
+                        for formId in className.get('10').get('buckets'):
+                            s_formId = formId.get('key')
+                            for opMethod in formId.get('3').get('buckets'):
+                                s_opMethod = opMethod.get('key')
+                                for timestamp in opMethod.get('2').get('buckets'):  
+                                    if loop_count == 0:
+                                        loop_count += 1
+                                        continue
+                                    else:
+                                        s_timestamp = timestamp.get('key')
+                                        s_count = timestamp.get('doc_count')
                                 #alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
                                 #self.update_mysql(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
-                                #print(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
-#so what now
+                                print(s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
 
 if __name__ == "__main__":
     metric1 = Metric(keyword="*")
