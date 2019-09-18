@@ -110,7 +110,6 @@ class Metric(object):
 
         for cluster in res_list:
             s_cluster = cluster.get('key')
-            print(s_cluster)
             for app in cluster.get('7').get('buckets'):
                 s_app = app.get('key')
                 for appId in app.get('8').get('buckets'):
