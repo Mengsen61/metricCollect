@@ -132,10 +132,11 @@ class Metric(object):
                                     else:
                                         s_timestamp = timestamp.get('key')
                                         s_count = timestamp.get('doc_count')
+                                        if s_count > 0:
                                 #alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
                                 #self.update_mysql(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
-                                        print(s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
-                                        alert_push_group("ERROR_op", s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
+                                            print(s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
+                                            alert_push_group("ERROR_op_dayu0", s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
         response_2 = client.search(
             index="*",
             body=body_2
@@ -159,8 +160,9 @@ class Metric(object):
                             else:
                                 s_timestamp2 = timestamp2.get('key')
                                 s_count2 = timestamp2.get('doc_count')
-                                print(s_cluster2, s_app2, s_appId2, s_classname2, s_timestamp2, s_count2)
-                                alert_push_group("ERROR", s_cluster2, s_app2, s_appId2, s_classname2, "null","null", s_timestamp2, s_count)                 
+                                if s_count2 > 0:
+                                    print(s_cluster2, s_app2, s_appId2, s_classname2, s_timestamp2, s_count2)
+                                    alert_push_group("ERROR_dayu0", s_cluster2, s_app2, s_appId2, s_classname2, "null","null", s_timestamp2, s_count)                 
 
 
 
