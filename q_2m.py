@@ -46,7 +46,7 @@ class Metric(object):
 
     def metric_query(self):
         client = Elasticsearch(self.eshost)
-        body = {
+        body_1 = {
     "size":0,
     "query":{
         "bool":{
@@ -100,12 +100,12 @@ class Metric(object):
                                                                 "interval":"20s","field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-60m","max":"now"},"format":"epoch_millis"
                                                             },
                                                             "aggs":{}}}}}}}}}}}}}}}}
-        print(body)
+        print(body_1)
 
-        body_1 = {"size":0,"query":{"bool":{"filter":[{"range":{"@timestamp":{"gte":"now-%s" % self.timerange,"lte":"now","format":"epoch_millis"}}},{"query_string":{"analyze_wildcard":True,"query":"*"}}]}},"aggs":{"5":{"terms":{"field":"clusterName.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"6":{"terms":{"field":"appName.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"7":{"terms":{"field":"logtags.appId.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"8":{"terms":{"field":"className.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"9":{"date_histogram":{"interval":"%s" % self.interval,"field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-%s" % self.timerange,"max":"now"},"format":"epoch_millis"},"aggs":{}}}}}}}}}}}} 
+        body_2 = {"size":0,"query":{"bool":{"filter":[{"range":{"@timestamp":{"gte":"now-%s" % self.timerange,"lte":"now","format":"epoch_millis"}}},{"query_string":{"analyze_wildcard":True,"query":"*"}}]}},"aggs":{"5":{"terms":{"field":"clusterName.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"6":{"terms":{"field":"appName.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"7":{"terms":{"field":"logtags.appId.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"8":{"terms":{"field":"className.keyword","size":10,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"9":{"date_histogram":{"interval":"%s" % self.interval,"field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-%s" % self.timerange,"max":"now"},"format":"epoch_millis"},"aggs":{}}}}}}}}}}}} 
         response_1 = client.search(
             index="*",
-            body=body
+            body=body_1
         )
 
         res_list = response_1.get('aggregations').get('6').get('buckets')
@@ -138,7 +138,7 @@ class Metric(object):
                                         alert_push_group("ERROR_op", s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
         response_2 = client.search(
             index="*",
-            body=body_1
+            body=body_2
             )
         res_list_2 = response_2.get('aggregations').get('5').get('buckets')
         #print(res_list)
