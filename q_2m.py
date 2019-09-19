@@ -3,10 +3,10 @@ from elasticsearch import Elasticsearch
 import pymysql, requests
 import settings
 
-def alert_push_group(s_measurement,s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count):
+def alert_push_group(s_measurement,s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count):
     url = "http://127.0.0.1:8086/write?db=test"
     #print(time*10**6)
-    payload = '%s,clusterName=%s,appName=%s,appId=%s,className=%s,formId=%s,opMethod=%s count=%d %d' % (s_measurement,s_cluster,s_app,s_appId,s_classname,s_formId,s_opMethod,s_count,s_timestamp*10**6)
+    payload = '%s,clusterName=%s,appName=%s,appId=%s,className=%s,formId=%s,formName=%s,opMethod=%s count=%d %d' % (s_measurement,s_cluster,s_app,s_appId,s_classname,s_formId,s_formName,s_opMethod,s_count,s_timestamp*10**6)
     response = requests.post(url, data=payload.encode('utf-8'))
     print(response.status_code)
     #print(response.headers)
@@ -90,6 +90,11 @@ class Metric(object):
                                                 "field":"logtags.formId.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
                                             },
                                             "aggs":{
+                                        "11":{
+                                            "terms":{
+                                                "field":"logtags.formName.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
+                                            },
+                                            "aggs":{
                                                 "3":{
                                                     "terms":{
                                                         "field":"logtags.opMethod.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1
@@ -99,7 +104,7 @@ class Metric(object):
                                                             "date_histogram":{
                                                                 "interval":"20s","field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-60m","max":"now"},"format":"epoch_millis"
                                                             },
-                                                            "aggs":{}}}}}}}}}}}}}}}}
+                                                            "aggs":{}}}}}}}}}}}}}}}}}}
         print(body_1)
 
         body_2 = {"size":0,"query":{"bool":{"filter":[{"range":{"@timestamp":{"gte":"now-%s" % self.timerange,"lte":"now","format":"epoch_millis"}}},{"query_string":{"analyze_wildcard":True,"query":"*"}}]}},"aggs":{"5":{"terms":{"field":"clusterName.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"6":{"terms":{"field":"appName.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"7":{"terms":{"field":"logtags.appId.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"8":{"terms":{"field":"className.keyword","size":500,"order":{"_key":"desc"},"min_doc_count":1},"aggs":{"9":{"date_histogram":{"interval":"%s" % self.interval,"field":"@timestamp","min_doc_count":0,"extended_bounds":{"min":"now-%s" % self.timerange,"max":"now"},"format":"epoch_millis"},"aggs":{}}}}}}}}}}}} 
@@ -122,21 +127,23 @@ class Metric(object):
 
                         for formId in className.get('10').get('buckets'):
                             s_formId = formId.get('key')
-                            for opMethod in formId.get('3').get('buckets'):
-                                s_opMethod = opMethod.get('key')
-                                loop_count = 0
-                                for timestamp in opMethod.get('2').get('buckets'):  
-                                    if loop_count == 0:
-                                        loop_count += 1
-                                        continue
-                                    else:
-                                        s_timestamp = timestamp.get('key')
-                                        s_count = timestamp.get('doc_count')
-                                        if s_count > 0:
-                                #alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
-                                #self.update_mysql(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
-                                            print(s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
-                                            alert_push_group("ERROR_op_dayu0", s_cluster, s_app, s_appId, s_classname, s_formId,s_opMethod, s_timestamp, s_count)
+                            for formName in formId.get('11').get('buckets'):
+                                s_formName = formId.get('key')
+                                for opMethod in formName.get('3').get('buckets'):
+                                    s_opMethod = opMethod.get('key')
+                                    loop_count = 0
+                                    for timestamp in opMethod.get('2').get('buckets'):  
+                                        if loop_count == 0:
+                                            loop_count += 1
+                                            continue
+                                        else:
+                                            s_timestamp = timestamp.get('key')
+                                            s_count = timestamp.get('doc_count')
+                                            if s_count > 0:
+                                    #alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
+                                    #self.update_mysql(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
+                                                print(s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count)
+                                                alert_push_group("ERROR_op_dayu0", s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count)
         response_2 = client.search(
             index="*",
             body=body_2
