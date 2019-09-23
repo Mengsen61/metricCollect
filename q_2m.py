@@ -6,7 +6,7 @@ import settings
 def alert_push_group(s_measurement,s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count):
     url = "http://127.0.0.1:8086/write?db=test"
     #print(time*10**6)
-    payload = '%s,clusterName=\'%s\',appName=\'%s\',appId=\'%s\',className=\'%s\',formId=\'%s\',formName=\'%s\',opMethod=\'%s\' count=%d %d' % (s_measurement,s_cluster,s_app,s_appId,s_classname,s_formId,s_formName,s_opMethod,s_count,s_timestamp*10**6)
+    payload = '%s,clusterName=\"%s\",appName=\"%s\",appId=\"%s\",className=\"%s\",formId=\"%s\",formName=\"%s\",opMethod=\"%s\" count=%d %d' % (s_measurement,s_cluster,s_app,s_appId,s_classname,s_formId,s_formName,s_opMethod,s_count,s_timestamp*10**6)
     response = requests.post(url, data=payload.encode('utf-8'))
     print(response.status_code)
     #print(response.headers)
@@ -143,7 +143,7 @@ class Metric(object):
                                     #alert_push_group(s_cluster,s_app,s_classname,self.keyword,s_level,s_count,s_timestamp)
                                     #self.update_mysql(s_cluster, s_app, s_classname, s_level, s_timestamp, s_count)
                                                 print(s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count)
-                                                alert_push_group("ERROR_form_0923", s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count)
+                                                alert_push_group("ERROR_form_02", s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count)
 
         print("start all")
         response_2 = client.search(
@@ -171,7 +171,7 @@ class Metric(object):
                                 s_count2 = timestamp2.get('doc_count')
                                 if s_count2 > 0:
                                     print(s_cluster2, s_app2, s_appId2, s_classname2, s_timestamp2, s_count2)
-                                    alert_push_group("ERROR_noform_0923", s_cluster2, s_app2, s_appId2, s_classname2, "null", "null","null", s_timestamp2, s_count2)           
+                                    alert_push_group("ERROR_noform_02", s_cluster2, s_app2, s_appId2, s_classname2, "null", "null","null", s_timestamp2, s_count2)           
 
 
 
