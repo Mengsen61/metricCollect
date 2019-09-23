@@ -169,7 +169,7 @@ class Metric(object):
                                 s_count2 = timestamp2.get('doc_count')
                                 if s_count2 > 0:
                                     print(s_cluster2, s_app2, s_appId2, s_classname2, s_timestamp2, s_count2)
-                                    alert_push_group("ERROR_dayu0", s_cluster2, s_app2, s_appId2, s_classname2, "null","null", s_timestamp2, s_count2)                 
+                                    alert_push_group("ERROR_dayu0", s_cluster2, s_app2, s_appId2, s_classname2, "null", "null","null", s_timestamp2, s_count2)           
 
 
 
