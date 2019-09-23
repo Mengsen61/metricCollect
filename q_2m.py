@@ -6,7 +6,7 @@ import settings
 def alert_push_group(s_measurement,s_cluster, s_app, s_appId, s_classname, s_formId,s_formName, s_opMethod, s_timestamp, s_count):
     url = "http://127.0.0.1:8086/write?db=test"
     #print(time*10**6)
-    payload = '%s,clusterName=\"%s\",appName=\"%s\",appId=\"%s\",className=\"%s\",formId=\"%s\",formName=\"%s\",opMethod=\"%s\" count=%d %d' % (s_measurement,s_cluster,s_app,s_appId,s_classname,s_formId,s_formName,s_opMethod,s_count,s_timestamp*10**6)
+    payload = '%s,clusterName=%s,appName=%s,appId=%s,className=%s,formId=%s,formName=%s,opMethod=%s count=%d %d' % (s_measurement,s_cluster,s_app,s_appId,s_classname,s_formId,s_formName,s_opMethod,s_count,s_timestamp*10**6)
     response = requests.post(url, data=payload.encode('utf-8'))
     print(response.status_code)
     #print(response.headers)
@@ -128,7 +128,7 @@ class Metric(object):
                         for formId in className.get('10').get('buckets'):
                             s_formId = formId.get('key')
                             for formName in formId.get('11').get('buckets'):
-                                s_formName = formName.get('key')
+                                s_formName = formName.get('key').replace(' ','-')
                                 for opMethod in formName.get('3').get('buckets'):
                                     s_opMethod = opMethod.get('key')
                                     loop_count = 0
