@@ -128,7 +128,7 @@ class Metric(object):
                         for formId in className.get('10').get('buckets'):
                             s_formId = formId.get('key')
                             for formName in formId.get('11').get('buckets'):
-                                s_formName = formId.get('key')
+                                s_formName = formName.get('key')
                                 for opMethod in formName.get('3').get('buckets'):
                                     s_opMethod = opMethod.get('key')
                                     loop_count = 0
